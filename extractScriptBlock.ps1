@@ -22,7 +22,7 @@
 #Some variables we'll use
     $SelEvents=@()
     $myOutObjects=@()
-    $tmpfi='.\zG_evtparser_tmp.evt'
+#    $tmpfi='.\zG_evtparser_tmp.evt'
     $extractOut='.\extract.txt'
     $currentDir=(Get-Location)
 
@@ -32,16 +32,17 @@ $thisFi=Get-Item $infile
 
     write-host "thisFi: " $thisFi
    
-#    foreach ($myEvtID in 4104) {         
-
-        $SelEvents = Get-WinEvent  -Path $thisFi  -Oldest # | Where-Object { $_.id -eq $myEvtID } 
-#        $relEvents = $SelEvents
+    foreach ($myEvtID in 4104) {         
+    Write-Host "collecting events w/ eventID $myEvtID."
+        $SelEvents += Get-WinEvent  -Path $thisFi  -Oldest  | Where-Object { $_.id -eq $myEvtID } 
+		write-host ("selEvents.count: " + $selEvents.count)
             foreach ($myEvt in $selEvents) {
 				$myOutObject = New-Object -TypeName psobject
 				$myOutObject | Add-Member -MemberType NoteProperty -Name ScriptBlock -value $myEvt.Properties.value[2] 
 				$myOutObjects+=$myOutObject
 				}
-    
+		}
+		
 write-host ("Total found: "+ $SelEvents.Count)
 $customObjOut=".\selectedObjects.xml"
 Write-Host "writing object out as $customObjOut"
