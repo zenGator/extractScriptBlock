@@ -40,7 +40,11 @@ $thisFi=Get-Item $infile
             foreach ($myEvt in $selEvents) {
 				$myOutObject = New-Object -TypeName psobject
                     $myOutObject | Add-Member -MemberType NoteProperty -Name Part -value $myEvt.Properties[0].value -PassThru |
-				    Add-Member -MemberType NoteProperty -Name TotalParts -value $myEvt.Properties[1].value -PassThru |
+#                    Add-Member -MemberType NoteProperty -Name [] -value $myEvt.[] -PassThru |
+                    Add-Member -MemberType NoteProperty -Name RecordID -value $myEvt.RecordID -PassThru |
+                    Add-Member -MemberType NoteProperty -Name UserId -value $myEvt.UserId -PassThru |
+                    Add-Member -MemberType NoteProperty -Name TimeCreated -value $myevt.TimeCreated.ToUniversalTime() -PassThru |
+                    Add-Member -MemberType NoteProperty -Name TotalParts -value $myEvt.Properties[1].value -PassThru |
 				    Add-Member -MemberType NoteProperty -Name ScriptBlock -value $myEvt.Properties[2].value -PassThru |
 				    Add-Member -MemberType NoteProperty -Name ScriptUID -value $myEvt.Properties[3].value 
 				$myOutObjects+=$myOutObject
@@ -55,10 +59,10 @@ $thisFi=Get-Item $infile
 		}
 		
 write-host ("Total found: "+ $SelEvents.Count)
-<#$customObjOut=".\selectedObjects.xml"
+$customObjOut=".\selectedObjects.xml"
 Write-Host "writing object out as $customObjOut"
 $myOutObjects | Export-Clixml $customObjOut
-#>
+
 
 Write-Host "finished, now cleaning up"
 
@@ -86,7 +90,8 @@ if (-not $success) { Write-Host ("Something has gone wrong while trying to close
 
 Remove-Item -LiteralPath $infile'.working'
 
- #Then these two commands to extract into something we can work with:
+<# #Then these two commands to extract into something we can work with:
     [xml]$XmlDocument = Get-Content -Path $customObjOut 
     foreach ( $evt in $XmlDocument.objs.Obj) { $evt.MS.s.innertext >> $extractOut}
     Write-Host ("Merging " + $XmlDocument.Objs.Obj.count +" event log entries into scriptblock at $extractOut")
+#>
