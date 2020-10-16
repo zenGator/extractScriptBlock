@@ -24,6 +24,7 @@
     $myOutObjects=@()
 #    $tmpfi='.\zG_evtparser_tmp.evt'
     $extractOut='.\extract.txt'
+    $myScriptblockOut='.\ExtractedScriptblock_'
     $currentDir=(Get-Location)
 
 $ErrorActionPreference = “Stop”
@@ -38,15 +39,27 @@ $thisFi=Get-Item $infile
 		write-host ("selEvents.count: " + $selEvents.count)
             foreach ($myEvt in $selEvents) {
 				$myOutObject = New-Object -TypeName psobject
-				$myOutObject | Add-Member -MemberType NoteProperty -Name ScriptBlock -value $myEvt.Properties.value[2] 
+                    $myOutObject | Add-Member -MemberType NoteProperty -Name Part -value $myEvt.Properties[0].value -PassThru |
+				    Add-Member -MemberType NoteProperty -Name TotalParts -value $myEvt.Properties[1].value -PassThru |
+				    Add-Member -MemberType NoteProperty -Name ScriptBlock -value $myEvt.Properties[2].value -PassThru |
+				    Add-Member -MemberType NoteProperty -Name ScriptUID -value $myEvt.Properties[3].value 
 				$myOutObjects+=$myOutObject
+
+#write each script out into its own file, named using the ScriptBlockID
+#toDo:  add header with datetime and total number of parts
+    #Initial time:
+    #Total pieces:
+    #(only when msg# is 1, i.e., property[0].value -eq 1)
+                $myEvt.Properties[2].value | Out-File -FilePath ($myScriptblockOut + $myEvt.Properties[3].value + ".txt" ) -Append
 				}
 		}
 		
 write-host ("Total found: "+ $SelEvents.Count)
-$customObjOut=".\selectedObjects.xml"
+<#$customObjOut=".\selectedObjects.xml"
 Write-Host "writing object out as $customObjOut"
 $myOutObjects | Export-Clixml $customObjOut
+#>
+
 Write-Host "finished, now cleaning up"
 
 #cleanup/restore
